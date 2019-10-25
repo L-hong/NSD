@@ -1,0 +1,21 @@
+drbd 安装配置
+   |-- 内核模块 （实现数据同步的具体功能）
+      `|- 内核模块安装
+       |- 官网下载软件包 drbd-8.4.11-1.tar.gz
+       |- 上传到要安装的主机，解包  tar -zxf drbd-8.4.11-1.tar.gz
+       |- 安装编译依赖软件包  yum install -y gcc make automake pkgconfig flex git kernel-devel kernel-headers 
+       |- 编译安装 make && make install
+       |- 验证  modprobe drbd
+       |- lsmod |grep -i drbd
+   |-- 命令行工具，实现指令交换
+      `|- 官网下载软件包 drbd-utils.tar.gz
+       |- 上传到要安装的主机，解包  tar -zxf drbd-utils.tar.gz
+       |- 编译安装 ./configure --prefix=/usr/local/drbd --without-83support --with-udev \
+                               --with-initscripttype=systemd --without-manual
+       |- 编译安装 make && make install
+       |- 编写配置文件 /usr/local/drbd/etc/drbd.d/drbd.res (详见配置文件)
+
+drbdadm create-md r1  # 初始化 drbd (两台)
+systemctl restart drbd  # 两台都需要重启
+drbdadm primary r1 --force # 强制把其中一台设置为主
+cat /proc/drbd        # 查看状态
